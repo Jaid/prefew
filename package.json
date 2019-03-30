@@ -3,8 +3,15 @@
   "version": "1.0.0",
   "author": "Jaid <jaid.jsx@gmail.com> (https://github.com/Jaid)",
   "dependencies": {
+    "@absolunet/fsp": "^1.6.0",
     "@babel/runtime": "^7.4.2",
-    "debug": "^4.1.1"
+    "chokidar": "^2.1.5",
+    "debug": "^4.1.1",
+    "platform-folders": "^0.4.0",
+    "sharp": "^0.22.0",
+    "socket.io": "^2.2.0",
+    "winston": "^3.2.1",
+    "yargs": "^13.2.2"
   },
   "devDependencies": {
     "ajv": "^6.10.0",
@@ -12,7 +19,7 @@
     "babel-plugin-pkg": "^1.0.1",
     "babel-preset-jaid": "^5.6.1",
     "caniuse-lite": "^1.0.30000955",
-    "eslint": "^5.15.3",
+    "eslint": "^5.16.0",
     "eslint-config-jaid": "^1.12.0",
     "jest": "^24.5.0",
     "opn-cli": "^4.0.0",
@@ -21,12 +28,13 @@
   },
   "scripts": {
     "clean": "rimraf dist/ test/**/dist/",
+    "start": "npm run build:dev && node dist/package/development/cli.js",
     "babel:prod": "rimraf dist/src-transpiled/production && NODE_ENV=production babel --out-dir dist/src-transpiled/production --source-maps true src",
     "babel:dev": "rimraf dist/src-transpiled/development && babel --out-dir dist/src-transpiled/development src",
     "babel:test": "rimraf dist/src-transpiled/test && NODE_ENV=test babel --out-dir dist/src-transpiled/test src",
     "build:prod": "NODE_ENV=production webpack",
     "build:dev": "webpack",
-    "test": "npm run build:prod && NODE_ENV=production MAIN=dist/package/production jest --runInBand",
+    "test": "npm run build:prod && NODE_ENV=production MAIN=dist/package/production/cli.js jest --runInBand",
     "test:coverage": "npm run test:dev -- --coverage --json --outputFile=dist/jest/stats.json",
     "test:dev": "NODE_ENV=test jest --runInBand",
     "test:debug": "DEBUG=\"$(basename $PWD),$(basename $PWD):*\" NODE_ENV=test node --inspect=9229 node_modules/jest/bin/jest.js --runInBand",

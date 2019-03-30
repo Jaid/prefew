@@ -1,105 +1,73 @@
 /** @module prefew */
 
-/**
- * @typedef valueGenerator
- * @type {function}
- * @param {string} value Original array entry
- * @param {number} index Index of the array entry (starts at 0)
- * @returns {*} Anything that will be the object entry value
- */
+import path from "path"
 
-/**
- * @typedef asyncValueGenerator
- * @type {function}
- * @async
- * @param {string} value Original array entry
- * @param {number} index Index of the array entry (starts at 0)
- * @returns {*} Anything that will be the object entry value
- */
+import {getConfigHome} from "platform-folders"
+import fsp from "@absolunet/fsp"
+import {noop, isFunction, isObject} from "lodash"
+import winston from "winston"
+import yargs from "yargs"
+import sharp from "sharp"
+import chokidar from "chokidar"
 
-const debug = require("debug")(_PKG_NAME)
+import twitchEmote28 from "./presets/twitchEmote28"
+import twitchEmote56 from "./presets/twitchEmote56"
+import twitchEmote112 from "./presets/twitchEmote112"
+import formatter from "./logFormatter"
 
-const emptyReturn = {}
+sharp.cache(false)
 
-/**
- * Converts an array to an object with static keys and customizable values
- * @example
- * import prefew from "prefew"
- * let result = prefew(["a", "b"])
- * result = {a: null, b: null}
- * @example
- * import prefew from "prefew"
- * let result = prefew(["a", "b"], "value")
- * result = {a: "value", b: "value"}
- * @example
- * import prefew from "prefew"
- * let result = prefew(["a", "b"], (key, index) => `value for ${key} #${index + 1}`)
- * result = {a: "value for a #1", b: "value for b #2"}
- * @function
- * @param {string[]} array Keys for the generated object
- * @param {valueGenerator|*} [valueGenerator=null] Optional function that sets the object values based on key and index
- * @returns {object<string, *>} A generated object based on the array input
- */
-export default (array, valueGenerator = null) => {
-  if (!Array.isArray(array) || !array.length) {
-    return emptyReturn
-  }
-  const object = {}
-  if (typeof valueGenerator === "function") {
-    array.forEach((key, index) => {
-      object[key] = valueGenerator(key, index)
-    })
-  } else {
-    for (const value of array) {
-      object[value] = valueGenerator
-    }
-  }
-  return object
+const presets = {
+  twitchEmote28,
+  twitchEmote56,
+  twitchEmote112,
 }
 
-/**
- * Converts an array to an object with static keys and customizable values
- * @example
- * import fs from "fs"
- * import path from "path"
- * import {parallel} from "prefew"
- * const keys = ["license", "readme", "package", ".travis", "not-here"]
- * const valueGenerator = async name => {
- *   const files = await fs.promises.readdir(path.resolve(__dirname, ".."))
- *   for (const file of files) {
- *     if (file.startsWith(`${name}.`)) {
- *       const stat = await fs.promises.stat(path.resolve(__dirname, "..", file), "utf8")
- *       return stat.size
- *     }
- *   }
- *   return null
- * }
- * let result = await parallel(keys, valueGenerator)
- * result = { ".travis": 1672, license: 1099, package: 1948, readme: 132, "not-here": null }
- * @async
- * @function
- * @param {string[]} array Keys for the generated object
- * @param {asyncValueGenerator|*} [valueGenerator=null] Async function that sets the object values based on key and index
- * @returns {Promise<object<string, *>>} A generated object based on the array input
- */
-export const parallel = async (array, valueGenerator = null) => {
-  if (!Array.isArray(array) || !array.length) {
-    return emptyReturn
-  }
-  const object = {}
-  if (typeof valueGenerator === "function") {
-    for (const key of array) {
-      object[key] = null // Setting object keys synchronously to ensure order
-    }
-    const jobs = array.map(async (key, index) => {
-      const value = await valueGenerator(key, index)
-      object[key] = value
+const configDirectory = path.join(getConfigHome(), _PKG_NAME)
+const imageDirectory = path.join(configDirectory, "images")
+const outputDirectory = path.join(configDirectory, "output")
+
+const log = winston.createLogger({
+  format: formatter(),
+  transports: [new winston.transports.Console()],
+})
+
+log.info(`Config directory: ${configDirectory}`)
+
+const job = async () => {
+  await fsp.ensureDir(imageDirectory)
+  const imageEntries = await fsp.readdir(imageDirectory)
+  log.info("Loaded %s images", imageEntries.length)
+  for (const entry of imageEntries) {
+    const entryId = path.basename(entry, ".png")
+    const entryOutputDirectory = path.join(outputDirectory, entryId)
+    await fsp.ensureDir(entryOutputDirectory)
+    const imagePath = path.join(imageDirectory, entry)
+    const chokidarEmitter = chokidar.watch(imagePath, {}).on("change", async () => {
+      log.info(`Received change event for ${entry}`)
+      const sharpImage = sharp(imagePath).sequentialRead(true)
+      for (const [presetId, preset] of Object.entries(presets)) {
+        let processedImage
+        if (preset.render |> isFunction) {
+          processedImage = sharpImage
+        } else if (preset.resize |> isObject) {
+          log.info(`${presetId} ${preset.resize.size}`)
+          const width = preset.resize.width || preset.resize.size
+          const height = preset.resize.height || preset.resize.size
+          const sharpenSigma = preset.resize.sharpenSigma
+          processedImage = sharpImage
+            .trim()
+            .resize(width, height, {
+              fit: "contain",
+              background: "#FFFFFF00",
+            })
+            .sharpen(sharpenSigma)
+        }
+        await processedImage.toFile(path.join(entryOutputDirectory, `${presetId}.png`))
+      }
     })
-    await Promise.all(jobs)
-  } else {
-    for (const value of array) {
-      object[value] = valueGenerator
-    }
+    chokidarEmitter.emit("change")
   }
-  return object
 }
+
+yargs.command("$0", "Starts prefew server", noop, job).argv
