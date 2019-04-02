@@ -62,13 +62,13 @@ const job = async () => {
   const server = new SocketServer(40666, prefewCore)
   log.info("Opened port 40666")
 
-  for (const [name, properties] of Object.entries(prefewCore.images)) {
-    const chokidarEmitter = chokidar.watch(properties.imagePath)
+  log.info("%o", prefewCore)
+  for (const [name, {imagePath}] of Object.entries(prefewCore.images)) {
+    const chokidarEmitter = chokidar.watch(imagePath)
     chokidarEmitter.on("change", async () => {
       log.info(`Received change event for ${name}`)
       server.pushChangesForImage(name)
     })
-    setInterval(() => chokidarEmitter.emit("change"), 10000)
   }
 }
 
