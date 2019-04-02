@@ -1,11 +1,37 @@
-import renderResize from "src/presets/renderResize"
+import sharp from "sharp"
 
 const size = 28
 
 export default {
   name: `Twitch Emote (${size}p)`,
-  render: renderResize({
-    size,
-    sharpenSigma: 0.6,
-  }),
+  render: async (sharpImage, {pixelZoom, sharpenSigma}) => {
+    const renderedImage = sharpImage
+      .trim()
+      .resize(size, size, {
+        fit: "contain",
+        background: "#FFFFFF00",
+      })
+      .sharpen(sharpenSigma / 10)
+    if (pixelZoom > 1) {
+      const renderedBuffer = await renderedImage.png().toBuffer()
+      const scaledImage = sharp(renderedBuffer)
+        .resize(size * pixelZoom, size * pixelZoom, {kernel: "nearest"})
+      return scaledImage
+    }
+    return renderedImage
+  },
+  options: {
+    pixelZoom: {
+      default: 1,
+      min: 1,
+      max: 10,
+      type: "number",
+    },
+    sharpenSigma: {
+      default: 6,
+      min: 3,
+      max: 20,
+      type: "number",
+    },
+  },
 }

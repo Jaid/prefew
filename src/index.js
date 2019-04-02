@@ -36,17 +36,29 @@ const log = winston.createLogger({
 
 log.info(`Config directory: ${configDirectory}`)
 
+const render = async (image, preset, presetOptions) => {
+  console.log(presetOptions)
+  const sharpImage = sharp(image.imagePath).sequentialRead(true)
+  const processedImage = await preset.render(sharpImage, presetOptions)
+  return processedImage
+    .webp({
+      quality: 100,
+      lossless: true,
+    })
+    .toBuffer()
+}
+
 const job = async () => {
   const prefewCore = {
     configDirectory,
     imageDirectory,
     outputDirectory,
-    presetNames: Object.keys(presets),
+    presets,
+    render,
   }
   await fsp.ensureDir(imageDirectory)
   prefewCore.images = await loadEntries(prefewCore)
 
-  log.info("%O", prefewCore)
   const server = new SocketServer(40666, prefewCore)
   log.info("Opened port 40666")
 
@@ -54,40 +66,10 @@ const job = async () => {
     const chokidarEmitter = chokidar.watch(properties.imagePath)
     chokidarEmitter.on("change", async () => {
       log.info(`Received change event for ${name}`)
-      const interestingPresets = server.getInterestingPresetsForImage(name)
-      if (!interestingPresets.length) {
-        return
-      }
-      log.info("I need to render image %s with presets %O", name, interestingPresets)
-      const sharpImage = sharp(properties.imagePath).sequentialRead(true)
-      for (const interestingPreset of interestingPresets) {
-        const renderedImage = await presets[interestingPreset]
-          .render(sharpImage)
-          .webp({
-            quality: 100,
-            lossless: true,
-          })
-          .toBuffer()
-        server.pushPreview(name, interestingPreset, renderedImage)
-      }
+      server.pushChangesForImage(name)
     })
     setInterval(() => chokidarEmitter.emit("change"), 10000)
   }
-
-  // log.info("Loaded %s images", imageEntries.length)
-
-  // for (const entry of imageEntries) {
-  // const entryId = path.basename(entry, ".png")
-  // const entryOutputDirectory = path.join(outputDirectory, entryId)
-  // await fsp.ensureDir(entryOutputDirectory)
-  // const imagePath = path.join(imageDirectory, entry)
-  //  const chokidarEmitter = chokidar.watch(imagePath, {}).on("change", async () => {
-  //  log.info(`Received change event for ${entry}`)
-  //  const sharpImage = sharp(imagePath).sequentialRead(true)
-  //  await processedImage.toFile(path.join(entryOutputDirectory, `${presetId}.png`))
-  // })
-  //  chokidarEmitter.emit("change")
-  //  }
 }
 
 yargs
