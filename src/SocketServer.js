@@ -36,12 +36,18 @@ export default class SocketServer {
         profile.presetOptions = presetOptions
         this.pushChangesForImage(profile.image)
       })
+      client.on("disconnect", () => {
+        delete this.clientProfiles[client.id]
+      })
       this.clientProfiles[client.id] = profile
     })
     this.server.listen(port)
   }
 
   async pushChangesForImage(name) {
+    if (Object.keys(this.clientProfiles).length > 3) {
+      console.warn("More than 3 clients connected. This is unusual.")
+    }
     const interestedProfiles = Object.values(this.clientProfiles).filter(({mode, image, preset}) => {
       if (!preset) {
         return false
