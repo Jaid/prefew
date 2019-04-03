@@ -2,14 +2,14 @@ import sharp from "sharp"
 
 const size = 56
 
-const render = async (sharpImage, {pixelZoom, sharpenSigma}) => {
+const render = async (sharpImage, {sharpenSigma}) => {
   const renderedImage = sharpImage
     .trim()
     .resize(size, size, {
       fit: "contain",
       background: "#FFFFFF00",
     })
-    .sharpen(sharpenSigma / 10)
+    .sharpen(sharpenSigma)
   return renderedImage
 }
 
@@ -18,15 +18,17 @@ export default {
   name: `Twitch Emote (${size}p)`,
   options: {
     pixelZoom: {
-      default: 1,
+      defaultValue: 1,
       min: 1,
       max: 6,
       type: "number",
     },
     sharpenSigma: {
-      default: 6,
-      min: 3,
-      max: 20,
+      defaultValue: 0.6,
+      min: 0.1,
+      max: 2,
+      precision: 1,
+      step: 0.1,
       type: "number",
     },
   },

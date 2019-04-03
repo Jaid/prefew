@@ -1,6 +1,8 @@
 import socketIo from "socket.io"
 import {pick, mapValues} from "lodash"
 
+const debug = require("debug")(_PKG_NAME)
+
 export default class SocketServer {
 
   constructor(port, prefewCore) {
@@ -11,9 +13,6 @@ export default class SocketServer {
     this.server.on("connection", client => {
       const profile = {
         socketClient: client,
-        image: null,
-        preset: null,
-        presetOptions: null,
         mode: null,
       }
       client.emit("hey", {
@@ -21,64 +20,63 @@ export default class SocketServer {
         images: mapValues(prefewCore.images, image => pick(image, "extension", "name")),
       })
       client.on("setMode", mode => {
+        debug("setMode: %s", mode)
         profile.mode = mode
       })
-      client.on("setImage", image => {
-        profile.image = image
-        this.pushChangesForImage(image)
-      })
-      client.on("setPreset", preset => {
-        profile.preset = preset
-        this.pushChangesForImage(profile.image)
-        profile.presetOptions = null
-      })
-      client.on("setPresetOptions", presetOptions => {
-        profile.presetOptions = presetOptions
-        this.pushChangesForImage(profile.image)
+      client.on("setOptions", options => {
+        profile.options = options
+        debug("setOptions: %o", options)
+        this.pushChangesForImage(profile.options.image)
       })
       client.on("disconnect", () => {
         delete this.clientProfiles[client.id]
-        console.log(`Connected clients: ${Object.keys(this.clientProfiles).length}`)
+        debug("Client %s disconnected, %d clients are connected now", client.id, Object.keys(this.clientProfiles).length)
       })
       this.clientProfiles[client.id] = profile
-      console.log(`Connected clients: ${Object.keys(this.clientProfiles).length}`)
+      debug("Client %s connected, %d clients are connected now", client.id, Object.keys(this.clientProfiles).length)
     })
     this.server.listen(port)
   }
 
   async pushChangesForImage(name) {
-    const interestedProfiles = Object.values(this.clientProfiles).filter(({mode, image, preset}) => {
-      if (!preset) {
+    const interestedProfiles = Object.values(this.clientProfiles).filter(({mode, options}) => {
+      if (!options) {
         return false
       }
       if (!mode) {
         return false
       }
-      if (!image || image !== name) {
+      if (!options.presets?.length) {
+        return false
+      }
+      if (!options.image || options.image !== name) {
         return false
       }
       return true
     })
+    debug("Determined %d interested profiles", interestedProfiles.length)
     const mirrorProfiles = Object.values(this.clientProfiles).filter(({mode}) => mode === "mirror")
     for (const profile of interestedProfiles) {
       const image = this.prefewCore.images[name]
-      const preset = this.prefewCore.presets[profile.preset]
-      const presetOptions = {}
-      if (preset.options) {
-        for (const [optionName, properties] of Object.entries(preset.options)) {
-          presetOptions[optionName] = profile.presetOptions?.[optionName] || properties.default
+      const renderedBuffers = []
+      for (const selectedPreset of profile.options.presets) {
+        const presetScheme = this.prefewCore.presets[selectedPreset.name]
+        const presetOptions = {
+          ...mapValues(presetScheme, ({defaultValue}) => defaultValue),
+          ...selectedPreset.options,
         }
+        const buffer = await this.prefewCore.render(image, presetScheme, presetOptions)
+        renderedBuffers.push({
+          buffer,
+          presetOptions,
+          image: name,
+          presetName: selectedPreset.name,
+          time: Number(new Date),
+        })
       }
-      const buffer = await this.prefewCore.render(image, preset, presetOptions)
-      const payload = {
-        image: name,
-        preset: profile.preset,
-        presetOptions,
-        buffer,
-      }
-      profile.socketClient.emit("newPreview", payload)
+      profile.socketClient.emit("newPreview", renderedBuffers)
       for (const mirrorProfile of mirrorProfiles) {
-        mirrorProfile.socketClient.emit("newPreview", payload)
+        mirrorProfile.socketClient.emit("newPreview", renderedBuffers)
       }
     }
   }
