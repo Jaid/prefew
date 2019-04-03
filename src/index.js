@@ -15,6 +15,7 @@ import SocketServer from "./SocketServer"
 import twitchEmote28 from "./presets/twitchEmote28"
 import twitchEmote56 from "./presets/twitchEmote56"
 import twitchEmote112 from "./presets/twitchEmote112"
+import twitchChat from "./presets/twitchChat"
 import formatter from "./logFormatter"
 
 sharp.cache(false)
@@ -23,6 +24,7 @@ const presets = {
   twitchEmote28,
   twitchEmote56,
   twitchEmote112,
+  twitchChat,
 }
 
 const configDirectory = path.join(getConfigHome(), _PKG_NAME)
@@ -36,35 +38,12 @@ const log = winston.createLogger({
 
 log.info(`Config directory: ${configDirectory}`)
 
-const render = async (image, preset, presetOptions) => {
-  const sharpImage = sharp(image.imagePath).sequentialRead(true)
-  let processedImage = await preset.render(sharpImage, presetOptions)
-  if (presetOptions.pixelZoom > 1) {
-    const renderedBuffer = await processedImage
-      .webp({
-        quality: 100,
-        lossless: true,
-      })
-      .toBuffer()
-    const newSharp = sharp(renderedBuffer)
-    const {width, height} = await newSharp.metadata()
-    processedImage = newSharp.resize(width * presetOptions.pixelZoom, height * presetOptions.pixelZoom, {kernel: "nearest"})
-  }
-  return processedImage
-    .webp({
-      quality: 100,
-      lossless: true,
-    })
-    .toBuffer()
-}
-
 const job = async () => {
   const prefewCore = {
     configDirectory,
     imageDirectory,
     outputDirectory,
     presets,
-    render,
   }
   await fsp.ensureDir(imageDirectory)
   prefewCore.images = await loadEntries(prefewCore)

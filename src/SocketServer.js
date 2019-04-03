@@ -1,5 +1,6 @@
 import socketIo from "socket.io"
 import {pick, mapValues} from "lodash"
+import renderAdvanced from "src/renderAdvanced"
 
 const debug = require("debug")(_PKG_NAME)
 
@@ -60,15 +61,11 @@ export default class SocketServer {
       const image = this.prefewCore.images[name]
       const renderedBuffers = []
       for (const selectedPreset of profile.options.presets) {
-        const presetScheme = this.prefewCore.presets[selectedPreset.name]
-        const presetOptions = {
-          ...mapValues(presetScheme, ({defaultValue}) => defaultValue),
-          ...selectedPreset.options,
-        }
-        const buffer = await this.prefewCore.render(image, presetScheme, presetOptions)
+        const preset = this.prefewCore.presets[selectedPreset.name]
+        const buffer = await renderAdvanced(image.imagePath, preset, selectedPreset.options)
         renderedBuffers.push({
           buffer,
-          presetOptions,
+          presetOptions: selectedPreset.options,
           image: name,
           presetName: selectedPreset.name,
           time: Number(new Date),

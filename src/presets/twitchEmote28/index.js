@@ -4,7 +4,6 @@ const size = 28
 
 const render = async (sharpImage, {sharpenSigma}) => {
   const renderedImage = sharpImage
-    .trim()
     .resize(size, size, {
       fit: "contain",
       background: "#FFFFFF00",

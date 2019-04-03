@@ -4,6 +4,7 @@
   "author": "Jaid <jaid.jsx@gmail.com> (https://github.com/Jaid)",
   "dependencies": {
     "@absolunet/fsp": "^1.6.0",
+    "@absolunet/fss": "^1.6.0",
     "@babel/runtime": "^7.4.3",
     "chokidar": "^2.1.5",
     "debug": "^4.1.1",
