@@ -37,9 +37,19 @@ const log = winston.createLogger({
 log.info(`Config directory: ${configDirectory}`)
 
 const render = async (image, preset, presetOptions) => {
-  console.log(presetOptions)
   const sharpImage = sharp(image.imagePath).sequentialRead(true)
-  const processedImage = await preset.render(sharpImage, presetOptions)
+  let processedImage = await preset.render(sharpImage, presetOptions)
+  if (presetOptions.pixelZoom > 1) {
+    const renderedBuffer = await processedImage
+      .webp({
+        quality: 100,
+        lossless: true,
+      })
+      .toBuffer()
+    const newSharp = sharp(renderedBuffer)
+    const {width, height} = await newSharp.metadata()
+    processedImage = newSharp.resize(width * presetOptions.pixelZoom, height * presetOptions.pixelZoom, {kernel: "nearest"})
+  }
   return processedImage
     .webp({
       quality: 100,

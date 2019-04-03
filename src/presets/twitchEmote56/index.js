@@ -2,24 +2,20 @@ import sharp from "sharp"
 
 const size = 56
 
+const render = async (sharpImage, {pixelZoom, sharpenSigma}) => {
+  const renderedImage = sharpImage
+    .trim()
+    .resize(size, size, {
+      fit: "contain",
+      background: "#FFFFFF00",
+    })
+    .sharpen(sharpenSigma / 10)
+  return renderedImage
+}
+
 export default {
+  render,
   name: `Twitch Emote (${size}p)`,
-  render: async (sharpImage, {pixelZoom, sharpenSigma}) => {
-    const renderedImage = sharpImage
-      .trim()
-      .resize(size, size, {
-        fit: "contain",
-        background: "#FFFFFF00",
-      })
-      .sharpen(sharpenSigma / 10)
-    if (pixelZoom > 1) {
-      const renderedBuffer = await renderedImage.png().toBuffer()
-      const scaledImage = sharp(renderedBuffer)
-        .resize(size * pixelZoom, size * pixelZoom, {kernel: "nearest"})
-      return scaledImage
-    }
-    return renderedImage
-  },
   options: {
     pixelZoom: {
       default: 1,
