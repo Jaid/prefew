@@ -13,27 +13,27 @@ const backgroundDarkBuffer = fss.readFile(backgroundDarkFile)
 const insertPositions = [
   {
     x: 79,
-    y: 9,
+    y: 20,
   },
   {
     x: 125,
-    y: 34,
+    y: 45,
   },
   {
     x: 109,
-    y: 59,
+    y: 70,
   },
   {
     x: 149,
-    y: 59,
+    y: 70,
   },
   {
     x: 173,
-    y: 59,
+    y: 70,
   },
   {
     x: 219,
-    y: 59,
+    y: 70,
   },
 ]
 
