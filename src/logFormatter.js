@@ -1,6 +1,5 @@
 import {format} from "winston"
 
-
 export default () => {
   const splat = format.splat()
   const ms = format.ms()

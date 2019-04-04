@@ -1,5 +1,6 @@
-import sharp, {Sharp} from "sharp"
+import sharp from "sharp"
 import {isString, isBuffer, mapValues} from "lodash"
+import jimp from "src/jimp"
 
 const debug = require("debug")(_PKG_NAME)
 
@@ -19,29 +20,16 @@ export default async (source, preset, presetOptions) => {
       source.clone()
     }
   }
-  const sharpImage = sourceSharp
-    .sequentialRead()
-    .extend({ // Workaround for trim() to always use a fully transparent pixel as boring indicator
-      left: 1,
-      top: 1,
-      bottom: 1,
-      right: 1,
-      background: {
-        r: 1,
-        g: 1,
-        b: 1,
-        alpha: 0,
-      },
-    })
-    .trim(1)
+  const loadedImageBuffer = await sourceSharp.sequentialRead().png({compressionLevel: 0}).toBuffer()
+  const jimpImage = await jimp.read(loadedImageBuffer)
+  const croppedBuffer = await jimpImage
+    .deflateLevel(0) // Skipping compression
+    .cropTransparent(mergedOptions.cropTolerance)
+    .getBufferAsync(jimp.MIME_PNG)
+  const sharpImage = sharp(croppedBuffer)
   let processedImage = await preset.render(sharpImage, mergedOptions)
   if (mergedOptions.pixelZoom > 1) {
-    const renderedBuffer = await processedImage
-      .webp({
-        quality: 100,
-        lossless: true,
-      })
-      .toBuffer()
+    const renderedBuffer = await processedImage.png({compressionLevel: 0}).toBuffer()
     const newSharp = sharp(renderedBuffer)
     const {width, height} = await newSharp.metadata()
     processedImage = newSharp.resize(width * mergedOptions.pixelZoom, height * mergedOptions.pixelZoom, {kernel: "nearest"})
