@@ -2,14 +2,14 @@ import {pixelZoomOptions, cropOptions, sharpenOptions} from "../baseOptions"
 
 const size = 56
 
-const render = async (sharpImage, {sharpen, sharpenSigma}) => {
+const render = async (sharpImage, {sharpen, sharpenSigma, sharpenJagged, sharpenFlat}) => {
   const renderedImage = sharpImage
     .resize(size, size, {
       fit: "contain",
       background: "#FFFFFF00",
     })
   if (sharpen) {
-    renderedImage.sharpen(sharpenSigma)
+    renderedImage.sharpen(sharpenSigma, sharpenFlat, sharpenJagged)
   }
   return renderedImage
 }

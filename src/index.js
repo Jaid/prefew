@@ -12,19 +12,25 @@ import chokidar from "chokidar"
 
 import loadEntries from "./loadEntries"
 import SocketServer from "./SocketServer"
+import discordEmote22 from "./presets/discordEmote22"
 import twitchEmote28 from "./presets/twitchEmote28"
 import twitchEmote56 from "./presets/twitchEmote56"
 import twitchEmote112 from "./presets/twitchEmote112"
+import discordChat from "./presets/discordChat"
 import twitchChat from "./presets/twitchChat"
+import square from "./presets/square"
 import formatter from "./logFormatter"
 
 sharp.cache(false)
 
 const presets = {
+  discordEmote22,
   twitchEmote28,
   twitchEmote56,
   twitchEmote112,
+  discordChat,
   twitchChat,
+  square,
 }
 
 const configDirectory = path.join(getConfigHome(), _PKG_NAME)

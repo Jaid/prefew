@@ -1,11 +1,9 @@
 import {pixelZoomOptions, cropOptions, sharpenOptions} from "../baseOptions"
 
-const size = 28
-
 const render = async (sharpImage, {sharpen, sharpenSigma, sharpenJagged, sharpenFlat}) => {
   const renderedImage = sharpImage
     .resize(size, size, {
-      fit: "contain",
+      fit: stretch ? "fill" : "contain",
       background: "#FFFFFF00",
     })
   if (sharpen) {
@@ -16,8 +14,20 @@ const render = async (sharpImage, {sharpen, sharpenSigma, sharpenJagged, sharpen
 
 export default {
   render,
-  name: `Twitch Emote (${size}p)`,
+  name: "Custom-sized square",
   options: {
+    size: {
+      defaultValue: 32,
+      min: 8,
+      max: 320,
+      precision: 0,
+      step: 8,
+      type: "number",
+    },
+    stretch: {
+      defaultValue: false,
+      type: "boolean",
+    },
     ...pixelZoomOptions(),
     ...cropOptions(),
     ...sharpenOptions(),

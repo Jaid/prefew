@@ -2,8 +2,7 @@ import sharp from "sharp"
 import fss from "@absolunet/fss"
 import renderAdvanced from "src/renderAdvanced"
 
-import twitchEmote28 from "../twitchEmote28"
-import {sharpenOptions, cropOptions} from "../baseOptions"
+import discordEmote22 from "../discordEmote22"
 
 import backgroundLightFile from "./backgroundLight.png"
 import backgroundDarkFile from "./backgroundDark.png"
@@ -13,39 +12,38 @@ const backgroundDarkBuffer = fss.readFile(backgroundDarkFile)
 
 const insertPositions = [
   {
-    x: 141,
-    y: 61,
+    x: 79,
+    y: 9,
   },
   {
-    x: 182,
-    y: 92,
+    x: 125,
+    y: 34,
   },
   {
-    x: 167,
-    y: 123,
+    x: 109,
+    y: 59,
   },
   {
-    x: 210,
-    y: 123,
+    x: 149,
+    y: 59,
   },
   {
-    x: 241,
-    y: 123,
+    x: 173,
+    y: 59,
   },
   {
-    x: 289,
-    y: 123,
+    x: 219,
+    y: 59,
   },
 ]
 
-const render = async (sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
+const render = async (sharpImage, {sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
   let renderedImage = sharp(darkMode ? backgroundDarkBuffer : backgroundLightBuffer)
-  const renderedEmote = await renderAdvanced(sharpImage, twitchEmote28, {
+  const renderedEmote = await renderAdvanced(sharpImage, discordEmote22, {
     sharpen,
     sharpenSigma,
     sharpenFlat,
     sharpenJagged,
-    cropTolerance,
   })
   renderedImage = renderedImage.composite(insertPositions.map(position => ({
     input: renderedEmote,
@@ -58,14 +56,12 @@ const render = async (sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpen
 
 export default {
   render,
-  name: "Twitch Chat",
+  name: "Discord Chat",
   description: "Based on screenshots of Google Chrome on Windows 10.",
   options: {
     darkMode: {
       defaultValue: true,
       type: "boolean",
     },
-    ...sharpenOptions(),
-    ...cropOptions(),
   },
 }
