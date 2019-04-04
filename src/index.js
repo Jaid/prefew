@@ -17,6 +17,7 @@ import twitchEmote28 from "./presets/twitchEmote28"
 import twitchEmote56 from "./presets/twitchEmote56"
 import twitchEmote112 from "./presets/twitchEmote112"
 import discordChat from "./presets/discordChat"
+import discordChatMobile from "./presets/discordChatMobile"
 import twitchChat from "./presets/twitchChat"
 import square from "./presets/square"
 import formatter from "./logFormatter"
@@ -29,6 +30,7 @@ const presets = {
   twitchEmote56,
   twitchEmote112,
   discordChat,
+  discordChatMobile,
   twitchChat,
   square,
 }
