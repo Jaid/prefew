@@ -1,4 +1,4 @@
-export const pixelZoom = () => ({
+export const pixelZoomOptions = () => ({
   pixelZoom: {
     defaultValue: 1,
     min: 1,
@@ -7,7 +7,7 @@ export const pixelZoom = () => ({
   },
 })
 
-export const cropTolerance = () => ({
+export const cropOptions = () => ({
   cropTolerance: {
     defaultValue: 0.1,
     min: 0,
@@ -18,7 +18,7 @@ export const cropTolerance = () => ({
   },
 })
 
-export const sharpen = () => ({
+export const sharpenOptions = () => ({
   sharpen: {
     type: "boolean",
     defaultValue: false,

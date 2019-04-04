@@ -3,7 +3,7 @@ import fss from "@absolunet/fss"
 import renderAdvanced from "src/renderAdvanced"
 
 import twitchEmote28 from "../twitchEmote28"
-import {sharpen} from "../baseOptions"
+import {sharpenOptions} from "../baseOptions"
 
 import backgroundLightFile from "./backgroundLight.png"
 import backgroundDarkFile from "./backgroundDark.png"
@@ -38,9 +38,12 @@ const insertPositions = [
   },
 ]
 
-const render = async (sharpImage, {sharpenSigma, darkMode}) => {
+const render = async (sharpImage, {sharpen, sharpenSigma, darkMode}) => {
   let renderedImage = sharp(darkMode ? backgroundDarkBuffer : backgroundLightBuffer)
-  const renderedEmote = await renderAdvanced(sharpImage, twitchEmote28, {sharpenSigma})
+  const renderedEmote = await renderAdvanced(sharpImage, twitchEmote28, {
+    sharpen,
+    sharpenSigma,
+  })
   renderedImage = renderedImage.composite(insertPositions.map(position => ({
     input: renderedEmote,
     left: position.x,
@@ -59,6 +62,6 @@ export default {
       defaultValue: true,
       type: "boolean",
     },
-    ...sharpen(),
+    ...sharpenOptions(),
   },
 }
