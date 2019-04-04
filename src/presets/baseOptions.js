@@ -18,7 +18,7 @@ export const cropTolerance = () => ({
   },
 })
 
-export const sharpenSigma = () => ({
+export const sharpen = () => ({
   sharpen: {
     type: "boolean",
     defaultValue: false,

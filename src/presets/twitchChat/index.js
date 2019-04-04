@@ -3,7 +3,7 @@ import fss from "@absolunet/fss"
 import renderAdvanced from "src/renderAdvanced"
 
 import twitchEmote28 from "../twitchEmote28"
-import {sharpenSigma} from "../baseOptions"
+import {sharpen} from "../baseOptions"
 
 import backgroundLightFile from "./backgroundLight.png"
 import backgroundDarkFile from "./backgroundDark.png"
@@ -59,6 +59,6 @@ export default {
       defaultValue: true,
       type: "boolean",
     },
-    ...sharpenSigma(),
+    ...sharpen(),
   },
 }

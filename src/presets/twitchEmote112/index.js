@@ -1,6 +1,4 @@
-import sharp from "sharp"
-
-import {pixelZoom, cropTolerance} from "../baseOptions"
+import {pixelZoom, cropTolerance, sharpen} from "../baseOptions"
 
 const size = 112
 
@@ -20,13 +18,6 @@ export default {
   options: {
     ...pixelZoom(),
     ...cropTolerance(),
-    sharpenSigma: {
-      defaultValue: 0.6,
-      min: 0.1,
-      max: 2,
-      precision: 1,
-      step: 0.1,
-      type: "number",
-    },
+    ...sharpen(),
   },
 }
