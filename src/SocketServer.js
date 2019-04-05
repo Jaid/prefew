@@ -1,6 +1,7 @@
 import socketIo from "socket.io"
 import {pick, mapValues} from "lodash"
 import renderAdvanced from "src/renderAdvanced"
+import sharp from "sharp"
 
 const debug = require("debug")(_PKG_NAME)
 
@@ -60,18 +61,19 @@ export default class SocketServer {
     const mirrorProfiles = Object.values(this.clientProfiles).filter(({mode}) => mode === "mirror")
     for (const profile of interestedProfiles) {
       const image = this.prefewCore.images[name]
-      const renderedBuffers = []
-      for (const selectedPreset of profile.options.presets) {
-        const preset = this.prefewCore.presets[selectedPreset.name]
-        const buffer = await renderAdvanced(image.imagePath, preset, selectedPreset.options)
-        renderedBuffers.push({
+      const sharpImage = sharp(image.imagePath)
+      const jobs = profile.options.presets.map(async requestedPreset => {
+        const preset = this.prefewCore.presets[requestedPreset.name]
+        const buffer = await renderAdvanced(sharpImage, preset, requestedPreset.options)
+        return {
           buffer,
-          presetOptions: selectedPreset.options,
+          presetOptions: requestedPreset.options,
           image: name,
-          presetName: selectedPreset.name,
+          presetName: requestedPreset.name,
           time: Number(new Date),
-        })
-      }
+        }
+      })
+      const renderedBuffers = await Promise.all(jobs)
       profile.socketClient.emit("newPreview", renderedBuffers)
       for (const mirrorProfile of mirrorProfiles) {
         mirrorProfile.socketClient.emit("newPreview", renderedBuffers)
