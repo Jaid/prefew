@@ -20,6 +20,7 @@ import discordChat from "./presets/discordChat"
 import discordChatMobile from "./presets/discordChatMobile"
 import twitchChat from "./presets/twitchChat"
 import square from "./presets/square"
+import favicon from "./presets/favicon"
 import formatter from "./logFormatter"
 
 sharp.cache(false)
@@ -32,6 +33,7 @@ const presets = {
   discordChat,
   discordChatMobile,
   twitchChat,
+  favicon,
   square,
 }
 

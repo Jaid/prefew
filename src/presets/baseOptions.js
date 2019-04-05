@@ -40,7 +40,7 @@ export const sharpenOptions = () => ({
     type: "number",
   },
   sharpenJagged: {
-    defaultValue: 1,
+    defaultValue: 2,
     min: 0.1,
     max: 3,
     precision: 1,
