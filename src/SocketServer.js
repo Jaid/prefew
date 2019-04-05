@@ -40,7 +40,7 @@ export default class SocketServer {
   }
 
   async pushChangesForImage(name) {
-    const interestedProfiles = Object.values(this.clientProfiles).filter(({mode, options}) => {
+    const interestedProfiles = Object.values(this.clientProfiles).filter(({socketClient, mode, options}) => {
       if (!options) {
         return false
       }
@@ -53,6 +53,7 @@ export default class SocketServer {
       if (!options.image || options.image !== name) {
         return false
       }
+      socketClient.emit("startingRender")
       return true
     })
     debug("Determined %d interested profiles", interestedProfiles.length)
