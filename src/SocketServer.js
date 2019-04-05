@@ -45,7 +45,7 @@ export default class SocketServer {
       if (!options) {
         return false
       }
-      if (!mode) {
+      if (mode !== "user") {
         return false
       }
       if (!options.presets?.length) {
