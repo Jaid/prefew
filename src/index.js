@@ -19,6 +19,7 @@ import twitchEmote112 from "./presets/twitchEmote112"
 import discordChat from "./presets/discordChat"
 import discordChatMobile from "./presets/discordChatMobile"
 import twitchChat from "./presets/twitchChat"
+import twitchBadge from "./presets/twitchBadge"
 import square from "./presets/square"
 import favicon from "./presets/favicon"
 import formatter from "./logFormatter"
@@ -33,6 +34,7 @@ const presets = {
   discordChat,
   discordChatMobile,
   twitchChat,
+  twitchBadge,
   favicon,
   square,
 }
