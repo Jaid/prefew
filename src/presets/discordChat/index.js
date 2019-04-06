@@ -5,11 +5,8 @@ import renderAdvanced from "src/renderAdvanced"
 import {sharpenOptions, cropOptions} from "../baseOptions"
 import discordEmote22 from "../discordEmote22"
 
-import backgroundLightFile from "./backgroundLight.png"
-import backgroundDarkFile from "./backgroundDark.png"
-
-const backgroundLightBuffer = fss.readFile(backgroundLightFile)
-const backgroundDarkBuffer = fss.readFile(backgroundDarkFile)
+import backgroundLightBuffer from "./backgroundLight.png"
+import backgroundDarkBuffer from "./backgroundDark.png"
 
 const insertPositions = [
   {
