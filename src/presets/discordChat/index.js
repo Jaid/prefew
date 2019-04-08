@@ -1,9 +1,6 @@
 import sharp from "sharp"
-import fss from "@absolunet/fss"
-import renderAdvanced from "src/renderAdvanced"
 
 import {sharpenOptions, cropOptions} from "../baseOptions"
-import discordEmote22 from "../discordEmote22"
 
 import backgroundLightBuffer from "./backgroundLight.png"
 import backgroundDarkBuffer from "./backgroundDark.png"
@@ -35,9 +32,9 @@ const insertPositions = [
   },
 ]
 
-const render = async (sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
+const render = async (prefewCore, sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
   let renderedImage = sharp(darkMode ? backgroundDarkBuffer : backgroundLightBuffer)
-  const renderedEmote = await renderAdvanced(sharpImage, discordEmote22, {
+  const renderedEmote = await prefewCore.render(sharpImage, "discordEmote22", {
     sharpen,
     sharpenSigma,
     sharpenFlat,

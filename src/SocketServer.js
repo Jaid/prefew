@@ -6,7 +6,6 @@ const debug = require("debug")(_PKG_NAME)
 export default class SocketServer {
 
   constructor(port, prefewCore) {
-    this.prefewCore = prefewCore
     this.server = socketIo()
     this.server.on("connection", client => {
       const profile = {
@@ -19,6 +18,7 @@ export default class SocketServer {
           images: mapValues(prefewCore.images, image => ({
             extension: image.extension,
             thumbnail: image.thumbnail,
+            type: image.type,
           })),
         })
       } else if (profile.mode === "mirror") {
@@ -32,7 +32,7 @@ export default class SocketServer {
       })
       client.on("updateImage", payload => {
         const {name, ...properties} = payload
-        this.prefewCore.updateProviderImage(name, properties)
+        prefewCore.updateProviderImage(name, properties)
       })
       client.on("disconnect", () => {
         prefewCore.removeClient(client.id)
@@ -41,9 +41,13 @@ export default class SocketServer {
     })
     this.server.listen(port)
     prefewCore.on("imageAdded", name => {
+      const image = prefewCore.images[name]
       for (const client of prefewCore.getClientsByMode("user")) {
         client.socketClient.emit("imageAdded", {
           name,
+          codec: image.codec,
+          thumbnail: image.thumbnail,
+          type: image.type,
         })
       }
     })

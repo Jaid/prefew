@@ -114,11 +114,18 @@ export default class extends EventEmitter {
         image.buffer = await fsp.readFile(image.imagePath)
       }
       const sharpImage = sharp(image.buffer)
+      const forcedOptions = {
+        ...image.forcedOptions,
+      }
       const jobs = client.options.presets.map(async requestedPreset => {
-        const renderedBuffer = await this.render(sharpImage, requestedPreset.name, requestedPreset.options)
+        const presetOptions = {
+          ...requestedPreset.options,
+          ...forcedOptions,
+        }
+        const renderedBuffer = await this.render(sharpImage, requestedPreset.name, presetOptions)
         return {
+          presetOptions,
           buffer: renderedBuffer,
-          presetOptions: requestedPreset.options,
           image: imageName,
           presetName: requestedPreset.name,
           time: Number(new Date),
@@ -138,6 +145,7 @@ export default class extends EventEmitter {
         type: "provider",
         codec: properties.codec,
         thumbnailSource: properties.buffer,
+        forcedOptions: properties.forcedOptions,
       })
     }
     await this.updateImage(name, properties.buffer)
@@ -192,14 +200,20 @@ export default class extends EventEmitter {
         source.clone()
       }
     }
-    const loadedImageBuffer = await sourceSharp.sequentialRead().png({compressionLevel: 0}).toBuffer()
-    const jimpImage = await jimp.read(loadedImageBuffer)
-    const croppedBuffer = await jimpImage
-      .deflateLevel(0) // Skipping compression
-      .cropTransparent(mergedOptions.cropTolerance)
-      .getBufferAsync(jimp.MIME_PNG)
-    const sharpImage = sharp(croppedBuffer)
-    let processedImage = await preset.render(sharpImage, mergedOptions)
+    let sharpImage
+    if (mergedOptions.skipTrimming) {
+      debug("Skipping trimming")
+      sharpImage = sourceSharp
+    } else {
+      const loadedImageBuffer = await sourceSharp.png({compressionLevel: 0}).toBuffer()
+      const jimpImage = await jimp.read(loadedImageBuffer)
+      const croppedBuffer = await jimpImage
+        .deflateLevel(0) // Skipping compression
+        .cropTransparent(mergedOptions.cropTolerance)
+        .getBufferAsync(jimp.MIME_PNG)
+      sharpImage = sharp(croppedBuffer)
+    }
+    let processedImage = await preset.render(this, sharpImage, mergedOptions)
     if (mergedOptions.pixelZoom > 1) {
       const renderedBuffer = await processedImage.png({compressionLevel: 0}).toBuffer()
       const newSharp = sharp(renderedBuffer)

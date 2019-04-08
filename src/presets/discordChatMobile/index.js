@@ -1,8 +1,4 @@
 import sharp from "sharp"
-import fss from "@absolunet/fss"
-import renderAdvanced from "src/renderAdvanced"
-
-import square from "../square"
 
 import backgroundLightBuffer from "./backgroundLight.png"
 import backgroundDarkBuffer from "./backgroundDark.png"
@@ -30,9 +26,9 @@ const insertPositions = [
   },
 ]
 
-const render = async (sharpImage, {sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
+const render = async (prefewCore, sharpImage, {sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
   let renderedImage = sharp(darkMode ? backgroundDarkBuffer : backgroundLightBuffer)
-  const renderedEmote42 = await renderAdvanced(sharpImage, square, {
+  const renderedEmote42 = await prefewCore.render(sharpImage, "square", {
     sharpen,
     sharpenSigma,
     sharpenFlat,
@@ -45,7 +41,7 @@ const render = async (sharpImage, {sharpen, sharpenSigma, sharpenFlat, sharpenJa
     top: position.y,
     gravity: sharp.gravity.northwest,
   }))
-  const renderedEmote84 = await renderAdvanced(sharpImage, square, {
+  const renderedEmote84 = await prefewCore.render(sharpImage, "square", {
     sharpen,
     sharpenSigma,
     sharpenFlat,

@@ -2,7 +2,7 @@ import {pixelZoomOptions, cropOptions} from "../baseOptions"
 
 const size = 22
 
-const render = async sharpImage => {
+const render = async (prefewCore, sharpImage) => {
   const renderedImage = sharpImage
     .resize(size, size, {
       fit: "contain",

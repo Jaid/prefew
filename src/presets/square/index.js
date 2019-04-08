@@ -1,6 +1,6 @@
 import {pixelZoomOptions, cropOptions, sharpenOptions} from "../baseOptions"
 
-const render = async (sharpImage, {size, stretch, sharpen, sharpenSigma, sharpenJagged, sharpenFlat}) => {
+const render = async (prefewCore, sharpImage, {size, stretch, sharpen, sharpenSigma, sharpenJagged, sharpenFlat}) => {
   const renderedImage = sharpImage
     .resize(size, size, {
       fit: stretch ? "fill" : "contain",

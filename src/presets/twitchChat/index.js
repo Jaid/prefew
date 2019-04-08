@@ -1,8 +1,5 @@
 import sharp from "sharp"
-import fss from "@absolunet/fss"
-import renderAdvanced from "src/renderAdvanced"
 
-import twitchEmote28 from "../twitchEmote28"
 import {sharpenOptions, cropOptions} from "../baseOptions"
 
 import backgroundLightBuffer from "./backgroundLight.png"
@@ -35,9 +32,9 @@ const insertPositions = [
   },
 ]
 
-const render = async (sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
+const render = async (prefewCore, sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
   let renderedImage = sharp(darkMode ? backgroundDarkBuffer : backgroundLightBuffer)
-  const renderedEmote = await renderAdvanced(sharpImage, twitchEmote28, {
+  const renderedEmote = await prefewCore.render(sharpImage, "twitchEmote28", {
     sharpen,
     sharpenSigma,
     sharpenFlat,

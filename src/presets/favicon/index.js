@@ -1,6 +1,4 @@
 import sharp from "sharp"
-import fss from "@absolunet/fss"
-import renderAdvanced from "src/renderAdvanced"
 
 import square from "../square"
 import {sharpenOptions, cropOptions} from "../baseOptions"
@@ -19,9 +17,9 @@ const insertPositions = [
   },
 ]
 
-const render = async (sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
+const render = async (prefewCore, sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
   let renderedImage = sharp(darkMode ? backgroundDarkBuffer : backgroundLightBuffer)
-  const renderedIcon16 = await renderAdvanced(sharpImage, square, {
+  const renderedIcon16 = await prefewCore.render(sharpImage, "square", {
     sharpen,
     sharpenSigma,
     sharpenFlat,
