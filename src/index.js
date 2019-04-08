@@ -3,45 +3,17 @@
 import path from "path"
 
 import {getConfigHome} from "platform-folders"
-import fsp from "@absolunet/fsp"
 import {noop} from "lodash"
 import winston from "winston"
 import yargs from "yargs"
 import sharp from "sharp"
-import chokidar from "chokidar"
 
-import loadEntries from "./loadEntries"
-import SocketServer from "./SocketServer"
-import discordEmote22 from "./presets/discordEmote22"
-import twitchEmote28 from "./presets/twitchEmote28"
-import twitchEmote56 from "./presets/twitchEmote56"
-import twitchEmote112 from "./presets/twitchEmote112"
-import discordChat from "./presets/discordChat"
-import discordChatMobile from "./presets/discordChatMobile"
-import twitchChat from "./presets/twitchChat"
-import twitchBadge from "./presets/twitchBadge"
-import square from "./presets/square"
-import favicon from "./presets/favicon"
 import formatter from "./logFormatter"
+import PrefewCore from "./PrefewCore"
 
 sharp.cache(false)
 
-const presets = {
-  discordEmote22,
-  twitchEmote28,
-  twitchEmote56,
-  twitchEmote112,
-  discordChat,
-  discordChatMobile,
-  twitchChat,
-  twitchBadge,
-  favicon,
-  square,
-}
-
 const configDirectory = path.join(getConfigHome(), _PKG_NAME)
-const imageDirectory = path.join(configDirectory, "images")
-const outputDirectory = path.join(configDirectory, "output")
 
 const log = winston.createLogger({
   format: formatter(),
@@ -50,27 +22,11 @@ const log = winston.createLogger({
 
 log.info(`Config directory: ${configDirectory}`)
 
-const job = async () => {
-  const prefewCore = {
-    configDirectory,
-    imageDirectory,
-    outputDirectory,
-    presets,
-  }
-  await fsp.ensureDir(imageDirectory)
-  prefewCore.images = await loadEntries(prefewCore)
-
-  const server = new SocketServer(40666, prefewCore)
-  log.info("Opened port 40666")
-
-  log.info("%o", prefewCore)
-  for (const [name, {imagePath}] of Object.entries(prefewCore.images)) {
-    const chokidarEmitter = chokidar.watch(imagePath)
-    chokidarEmitter.on("change", async () => {
-      log.info(`Received change event for ${name}`)
-      server.pushChangesForImage(name)
-    })
-  }
+const job = () => {
+  const prefewCore = new PrefewCore({
+    directory: configDirectory,
+  })
+  prefewCore.setup()
 }
 
 yargs
