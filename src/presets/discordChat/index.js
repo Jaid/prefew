@@ -1,6 +1,7 @@
 import sharp from "sharp"
 
 import {sharpenOptions, cropOptions} from "../baseOptions"
+import Preset from "../Preset"
 
 import backgroundLightBuffer from "./backgroundLight.png"
 import backgroundDarkBuffer from "./backgroundDark.png"
@@ -32,34 +33,38 @@ const insertPositions = [
   },
 ]
 
-const render = async (prefewCore, sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
-  let renderedImage = sharp(darkMode ? backgroundDarkBuffer : backgroundLightBuffer)
-  const renderedEmote = await prefewCore.render(sharpImage, "discordEmote22", {
-    sharpen,
-    sharpenSigma,
-    sharpenFlat,
-    sharpenJagged,
-    cropTolerance,
-  })
-  renderedImage = renderedImage.composite(insertPositions.map(position => ({
-    input: renderedEmote,
-    left: position.x,
-    top: position.y,
-    gravity: sharp.gravity.northwest,
-  })))
-  return renderedImage
-}
+export default class extends Preset {
 
-export default {
-  render,
-  name: "Discord Chat",
-  description: "Based on screenshots of Google Chrome on Windows 10.",
-  options: {
-    darkMode: {
-      defaultValue: true,
-      type: "boolean",
-    },
-    ...sharpenOptions(),
-    ...cropOptions(),
-  },
+  constructor(prefewCore) {
+    super(prefewCore)
+    this.title = "Discord Chat"
+    this.description = "Based on screenshots of Google Chrome on Windows 10."
+    this.addOptionsSchema({
+      darkMode: {
+        defaultValue: true,
+        type: "boolean",
+      },
+      ...sharpenOptions(),
+      ...cropOptions(),
+    })
+  }
+
+  async render(prefewCore, sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
+    const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
+    const renderedEmote = await prefewCore.render(backgroundBuffer, prefewCore.presets.discordEmote22.render, {
+      sharpen,
+      sharpenSigma,
+      sharpenFlat,
+      sharpenJagged,
+      cropTolerance,
+    })
+    renderedImage = renderedImage.composite(insertPositions.map(position => ({
+      input: renderedEmote,
+      left: position.x,
+      top: position.y,
+      gravity: sharp.gravity.northwest,
+    })))
+    return renderedImage
+  }
+
 }

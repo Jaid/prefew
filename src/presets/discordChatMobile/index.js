@@ -1,5 +1,8 @@
 import sharp from "sharp"
 
+import {cropOptions} from "../baseOptions"
+import Preset from "../Preset"
+
 import backgroundLightBuffer from "./backgroundLight.png"
 import backgroundDarkBuffer from "./backgroundDark.png"
 
@@ -26,46 +29,51 @@ const insertPositions = [
   },
 ]
 
-const render = async (prefewCore, sharpImage, {sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) => {
-  let renderedImage = sharp(darkMode ? backgroundDarkBuffer : backgroundLightBuffer)
-  const renderedEmote42 = await prefewCore.render(sharpImage, "square", {
-    sharpen,
-    sharpenSigma,
-    sharpenFlat,
-    sharpenJagged,
-    size: 42,
-  })
-  const smallLayers = insertPositions.map(position => ({
-    input: renderedEmote42,
-    left: position.x,
-    top: position.y,
-    gravity: sharp.gravity.northwest,
-  }))
-  const renderedEmote84 = await prefewCore.render(sharpImage, "square", {
-    sharpen,
-    sharpenSigma,
-    sharpenFlat,
-    sharpenJagged,
-    size: 84,
-  })
-  const largeLayer = {
-    input: renderedEmote84,
-    left: 152,
-    top: 94,
-    gravity: sharp.gravity.northwest,
-  }
-  renderedImage = renderedImage.composite([largeLayer, ...smallLayers])
-  return renderedImage
-}
+export default class extends Preset {
 
-export default {
-  render,
-  name: "Discord Chat (Mobile)",
-  description: "Based on screenshots of Android 9 on a Google Pixel 2.",
-  options: {
-    darkMode: {
-      defaultValue: true,
-      type: "boolean",
-    },
-  },
+  constructor(prefewCore) {
+    super(prefewCore)
+    this.title = "Discord Chat (Mobile)"
+    this.description = "Based on screenshots of Android 9 on a Google Pixel 2."
+    this.addOptionsSchema({
+      darkMode: {
+        defaultValue: true,
+        type: "boolean",
+      },
+      ...cropOptions(),
+    })
+  }
+
+  async render(prefewCore, sharpImage, {sharpen, darkMode}) {
+    const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
+    const renderedEmote42 = await prefewCore.render(backgroundBuffer, prefewCore.presets.square.render, {
+      sharpen,
+      sharpenSigma,
+      sharpenFlat,
+      sharpenJagged,
+      size: 42,
+    })
+    const smallLayers = insertPositions.map(position => ({
+      input: renderedEmote42,
+      left: position.x,
+      top: position.y,
+      gravity: sharp.gravity.northwest,
+    }))
+    const renderedEmote84 = await prefewCore.render(sharpImage, prefewCore.presets.square.render, {
+      sharpen,
+      sharpenSigma,
+      sharpenFlat,
+      sharpenJagged,
+      size: 84,
+    })
+    const largeLayer = {
+      input: renderedEmote84,
+      left: 152,
+      top: 94,
+      gravity: sharp.gravity.northwest,
+    }
+    renderedImage = renderedImage.composite([largeLayer, ...smallLayers])
+    return renderedImage
+  }
+
 }

@@ -1,21 +1,27 @@
 import {pixelZoomOptions, cropOptions} from "../baseOptions"
+import Preset from "../Preset"
 
 const size = 22
 
-const render = async (prefewCore, sharpImage) => {
-  const renderedImage = sharpImage
-    .resize(size, size, {
-      fit: "contain",
-      background: "#FFFFFF00",
-    })
-  return renderedImage
-}
+export default class extends Preset {
 
-export default {
-  render,
-  name: `Discord Emote (${size}p)`,
-  options: {
-    ...pixelZoomOptions(),
-    ...cropOptions(),
-  },
+  constructor(prefewCore) {
+    super(prefewCore)
+    this.title = `Discord Emote (${size}p)`
+    this.description = ""
+    this.addOptionsSchema({
+      ...pixelZoomOptions(),
+      ...cropOptions(),
+    })
+  }
+
+  async render(prefewCore, sharpImage) {
+    const renderedImage = sharpImage
+      .resize(size, size, {
+        fit: "contain",
+        background: "#FFFFFF00",
+      })
+    return renderedImage
+  }
+
 }
