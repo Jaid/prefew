@@ -11,6 +11,7 @@
     "eventemitter3": "^3.1.0",
     "globby": "^9.2.0",
     "jimp": "^0.6.1",
+    "p-cancelable": "^2.0.0",
     "platform-folders": "^0.4.0",
     "sharp": "^0.22.0",
     "socket.io": "^2.2.0",
