@@ -39,7 +39,7 @@ export default class extends EventEmitter {
     return presetRequire.keys().reduce((state, value) => {
       const presetName = value.match(/\.\/(?<key>[\da-z]+)\//i).groups.key
       const Preset = presetRequire(value).default
-      state[presetName] = new Preset
+      state[presetName] = new Preset(this)
       return state
     }, {})
   }
@@ -109,27 +109,9 @@ export default class extends EventEmitter {
       return
     }
     debug("Determined %d interested clients", interestedClients.length)
-    for (const client of interestedClients) {
-      if (client.renderJob) {
-        debug("There is already a job running. Trying to overwrite.")
-        client.renderJob.cancel()
-      }
-      const renderJob = this.renderPreviewsForClientCancelable(client)
-      client.renderJob = renderJob
-      await renderJob
+    for (const interestedClient of interestedClients) {
+      this.renderPreviewsForClient(interestedClient)
     }
-  }
-
-  renderPreviewsForClientCancelable(client) {
-    const jobWrapper = PCancelable.fn(onCancel => {
-      // onCancel.shouldReject = false
-      onCancel(() => {
-        debug("Cancelled")
-      })
-      return this.renderPreviewsForClient(client)
-    })
-    const renderJob = jobWrapper()
-    return renderJob
   }
 
   async renderPreviewsForClient(client) {
@@ -150,35 +132,52 @@ export default class extends EventEmitter {
         imageName,
         presetName: requestedPreset.name,
         buffer: image.buffer,
-        options: {
-          ...preset.defaultOptions, // Options set by preset
-          ...requestedPreset.options, // Options set by user
-          ...forcedOptions, // Options set by image
-        },
+        options: preset.mergeOptions({
+          ...requestedPreset.options,
+          ...forcedOptions,
+        }),
       }
     })
-    const renderedBuffers = await this.createRenderWorker(jobPayloads)
-    client.socketClient.emit("newPreview", renderedBuffers)
-    for (const mirrorClient of this.getClientsByMode("mirror")) {
-      mirrorClient.socketClient.emit("newPreview", renderedBuffers)
+    const workerStartTime = Date.now()
+    client.workerStartTime = workerStartTime
+    const renderWorker = this.createRenderWorker(jobPayloads)
+    renderWorker.workerStartTime = workerStartTime
+    if (client.renderWorker) {
+      debug("There is already a job running. Trying to overwrite.")
+      client.renderWorker.cancel()
     }
-    client.renderJob = null
+    client.renderWorker = renderWorker
+    const renderedBuffers = await renderWorker
+    if (renderedBuffers && client.workerStartTime === renderWorker.workerStartTime) {
+      client.socketClient.emit("newPreview", renderedBuffers)
+      for (const mirrorClient of this.getClientsByMode("mirror")) {
+        mirrorClient.socketClient.emit("newPreview", renderedBuffers)
+      }
+      client.renderWorker = null
+    }
   }
 
   createRenderWorker(jobPayloads) {
     const jobs = jobPayloads.map(async jobPayload => {
-      const startTime = Number(new Date)
-      const renderedBuffer = await this.render(jobPayload.buffer, jobPayload.preset.render, jobPayload.options)
+      const startTime = Date.now()
+      const renderedBuffer = await this.render(jobPayload.buffer, jobPayload.preset, jobPayload.options)
       return {
         startTime,
         presetOptions: jobPayload.options,
         buffer: renderedBuffer,
         image: jobPayload.imageName,
         presetName: jobPayload.presetName,
-        endTime: Number(new Date),
+        endTime: Date.now(),
       }
     })
-    return Promise.all(jobs)
+    return new PCancelable((resolve, reject, onCancel) => {
+      onCancel.shouldReject = false
+      onCancel(() => {
+        debug("Cancelled")
+        resolve(false)
+      })
+      Promise.all(jobs).then(resolve).catch(reject)
+    })
   }
 
   async updateProviderImage(name, properties) {
@@ -225,7 +224,7 @@ export default class extends EventEmitter {
     debug("Client %s disconnected, %d clients are connected now", clientId, Object.keys(this.clients).length)
   }
 
-  async render(source, renderPromise, options) {
+  async render(source, preset, options) {
     // debug("Rendering %s with preset \"%s\" and options %o", isString(source) ? source : "buffer", preset.name, mergedOptions)
     const sourceSharp = do {
       if (isString(source)) {
@@ -248,7 +247,7 @@ export default class extends EventEmitter {
         .getBufferAsync(jimp.MIME_PNG)
       sharpImage = sharp(croppedBuffer)
     }
-    let processedImage = await renderPromise(this, sharpImage, options)
+    let processedImage = await preset.render(sharpImage, options)
     if (options.pixelZoom > 1) {
       const renderedBuffer = await processedImage.png({compressionLevel: 0}).toBuffer()
       const newSharp = sharp(renderedBuffer)
