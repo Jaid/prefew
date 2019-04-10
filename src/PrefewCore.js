@@ -132,10 +132,10 @@ export default class extends EventEmitter {
         previewId: requestedPreset.previewId,
         presetName: requestedPreset.name,
         buffer: image.buffer,
-        options: preset.mergeOptions({
+        options: {
           ...requestedPreset.options,
           ...forcedOptions,
-        }),
+        },
       }
     })
     const workerStartTime = Date.now()
@@ -227,7 +227,8 @@ export default class extends EventEmitter {
   }
 
   async render(source, preset, options) {
-    // debug("Rendering %s with preset \"%s\" and options %o", isString(source) ? source : "buffer", preset.name, mergedOptions)
+    options = options |> preset.mergeOptions
+    // debug("Rendering %s with preset \"%s\" and options %o", isString(source) ? source : "buffer", preset.title, options)
     const sourceSharp = do {
       if (isString(source)) {
         sharp(source)

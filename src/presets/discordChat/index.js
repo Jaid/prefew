@@ -44,7 +44,6 @@ export default class extends Preset {
         defaultValue: true,
         type: "boolean",
       },
-      ...sharpenOptions(),
       ...cropOptions(),
     })
   }
