@@ -49,22 +49,22 @@ export default class extends Preset {
     })
   }
 
-  async render(prefewCore, sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
+  async render(sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
     const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
-    const renderedEmote = await prefewCore.render(backgroundBuffer, prefewCore.presets.twitchEmote28.render, {
+    const twitchEmote28Preset = this.prefewCore.presets.twitchEmote28
+    const renderedEmote = await this.prefewCore.render(sharpImage, twitchEmote28Preset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,
       sharpenJagged,
       cropTolerance,
     })
-    renderedImage = renderedImage.composite(insertPositions.map(position => ({
+    return sharp(backgroundBuffer).composite(insertPositions.map(position => ({
       input: renderedEmote,
       left: position.x,
       top: position.y,
       gravity: sharp.gravity.northwest,
     })))
-    return renderedImage
   }
 
 }

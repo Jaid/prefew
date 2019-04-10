@@ -44,9 +44,10 @@ export default class extends Preset {
     })
   }
 
-  async render(prefewCore, sharpImage, {sharpen, darkMode}) {
+  async render(sharpImage, {sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
     const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
-    const renderedEmote42 = await prefewCore.render(backgroundBuffer, prefewCore.presets.square.render, {
+    const squarePreset = this.prefewCore.presets.square
+    const renderedEmote42 = await this.prefewCore.render(sharpImage, squarePreset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,
@@ -59,7 +60,7 @@ export default class extends Preset {
       top: position.y,
       gravity: sharp.gravity.northwest,
     }))
-    const renderedEmote84 = await prefewCore.render(sharpImage, prefewCore.presets.square.render, {
+    const renderedEmote84 = await this.prefewCore.render(sharpImage, squarePreset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,
@@ -72,8 +73,7 @@ export default class extends Preset {
       top: 94,
       gravity: sharp.gravity.northwest,
     }
-    renderedImage = renderedImage.composite([largeLayer, ...smallLayers])
-    return renderedImage
+    return sharp(backgroundBuffer).composite([largeLayer, ...smallLayers])
   }
 
 }

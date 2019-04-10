@@ -25,7 +25,7 @@ export default class extends Preset {
     })
   }
 
-  async render(prefewCore, sharpImage, {size, stretch, sharpen, sharpenSigma, sharpenJagged, sharpenFlat}) {
+  async render(sharpImage, {size, stretch, sharpen, sharpenSigma, sharpenJagged, sharpenFlat}) {
     const renderedImage = sharpImage
       .resize(size, size, {
         fit: stretch ? "fill" : "contain",

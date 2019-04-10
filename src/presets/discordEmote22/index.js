@@ -15,7 +15,7 @@ export default class extends Preset {
     })
   }
 
-  async render(prefewCore, sharpImage) {
+  async render(sharpImage) {
     const renderedImage = sharpImage
       .resize(size, size, {
         fit: "contain",

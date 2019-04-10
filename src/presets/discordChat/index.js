@@ -49,22 +49,22 @@ export default class extends Preset {
     })
   }
 
-  async render(prefewCore, sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
+  async render(sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
+    const discordEmote22Preset = this.prefewCore.presets.discordEmote22
     const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
-    const renderedEmote = await prefewCore.render(backgroundBuffer, prefewCore.presets.discordEmote22.render, {
+    const renderedEmote = await this.prefewCore.render(sharpImage, discordEmote22Preset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,
       sharpenJagged,
       cropTolerance,
     })
-    renderedImage = renderedImage.composite(insertPositions.map(position => ({
+    return sharp(backgroundBuffer).composite(insertPositions.map(position => ({
       input: renderedEmote,
       left: position.x,
       top: position.y,
       gravity: sharp.gravity.northwest,
     })))
-    return renderedImage
   }
 
 }
