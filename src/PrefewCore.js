@@ -130,6 +130,7 @@ export default class extends EventEmitter {
       return {
         preset,
         imageName,
+        previewId: requestedPreset.previewId,
         presetName: requestedPreset.name,
         buffer: image.buffer,
         options: preset.mergeOptions({
@@ -149,6 +150,7 @@ export default class extends EventEmitter {
     client.renderWorker = renderWorker
     const renderedBuffers = await renderWorker
     if (renderedBuffers && client.workerStartTime === renderWorker.workerStartTime) {
+      client.lastRenderResult = renderedBuffers
       client.socketClient.emit("newPreview", renderedBuffers)
       for (const mirrorClient of this.getClientsByMode("mirror")) {
         mirrorClient.socketClient.emit("newPreview", renderedBuffers)
@@ -163,6 +165,7 @@ export default class extends EventEmitter {
       const renderedBuffer = await this.render(jobPayload.buffer, jobPayload.preset, jobPayload.options)
       return {
         startTime,
+        previewId: jobPayload.previewId,
         presetOptions: jobPayload.options,
         buffer: renderedBuffer,
         image: jobPayload.imageName,
