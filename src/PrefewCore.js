@@ -83,7 +83,6 @@ export default class extends EventEmitter {
 
   async addImage(name, options) {
     const entryOutputDirectory = path.join(this.outputDirectory, name)
-    await fsp.ensureDir(entryOutputDirectory)
     const image = {
       entryOutputDirectory,
       ...options,
@@ -263,6 +262,23 @@ export default class extends EventEmitter {
         lossless: true,
       })
       .toBuffer()
+  }
+
+  async exportImagesForClient(clientId) {
+    const client = this.clients[clientId]
+    const image = this.images[client.options.image]
+    const imageOutputDirectory = path.join(image.entryOutputDirectory, String(Date.now()))
+    await fsp.ensureDir(imageOutputDirectory)
+    const lastRenderResult = client.lastRenderResult
+    const jobs = lastRenderResult.map(async renderResult => {
+      const preset = this.presets[renderResult.presetName]
+      const presetExistsMultipleTimes = lastRenderResult.filter(({presetName}) => presetName === renderResult.presetName).length > 1
+      const fileName = `${presetExistsMultipleTimes ? `${preset.title} (${renderResult.previewId})` : preset.title}.png`
+      const outputFile = path.join(imageOutputDirectory, fileName)
+      await sharp(renderResult.buffer).png().toFile(outputFile)
+    })
+    await Promise.all(jobs)
+    client.socketClient.emit("exportFinished")
   }
 
 }

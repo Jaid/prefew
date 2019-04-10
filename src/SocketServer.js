@@ -30,6 +30,7 @@ export default class SocketServer {
       client.on("setOptions", options => {
         prefewCore.updateClientOptions(client.id, options)
       })
+      client.on("export", () => prefewCore.exportImagesForClient(client.id))
       client.on("updateImage", payload => {
         const {name, ...properties} = payload
         prefewCore.updateProviderImage(name, properties)
