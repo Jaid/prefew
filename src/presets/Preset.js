@@ -1,6 +1,6 @@
 import {mapValues} from "lodash"
 
-import {clientZoomOptions} from "../baseOptions"
+import {clientZoomOptions} from "./baseOptions"
 
 export default class {
 
