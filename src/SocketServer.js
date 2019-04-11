@@ -14,7 +14,7 @@ export default class SocketServer {
       }
       if (profile.mode === "user") {
         client.emit("hey", {
-          presets: mapValues(prefewCore.presets, preset => pick(preset, "title", "optionsSchema")),
+          presets: mapValues(prefewCore.presets, preset => pick(preset, "title", "optionsSchema", "description", "pixelatedZoom")),
           images: mapValues(prefewCore.images, image => ({
             extension: image.extension,
             thumbnail: image.thumbnail,
@@ -23,7 +23,7 @@ export default class SocketServer {
         })
       } else if (profile.mode === "mirror") {
         client.emit("hey", {
-          presets: mapValues(prefewCore.presets, preset => pick(preset, "title", "optionsSchema")),
+          presets: mapValues(prefewCore.presets, preset => pick(preset, "title", "optionsSchema", "pixelatedZoom")),
           images: mapValues(prefewCore.images, ({extension}) => ({extension})),
         })
       }
