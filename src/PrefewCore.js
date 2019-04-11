@@ -255,10 +255,8 @@ export default class extends EventEmitter {
       sharpImage = sharp(croppedBuffer)
     }
     const processedImage = await preset.render(sharpImage, options)
-    const [metadata, buffer] = await Promise.all([
-      processedImage.metadata(),
-      processedImage.webp(webpBufferConfig).toBuffer(),
-    ])
+    const buffer = await processedImage.webp(webpBufferConfig).toBuffer()
+    const metadata = await sharp(buffer).metadata()
     return {
       metadata,
       buffer,
