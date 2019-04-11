@@ -52,7 +52,7 @@ export default class extends Preset {
   async render(sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
     const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
     const twitchEmote28Preset = this.prefewCore.presets.twitchEmote28
-    const renderedEmote = await this.prefewCore.render(sharpImage, twitchEmote28Preset, {
+    const {buffer: renderedEmote} = await this.prefewCore.render(sharpImage, twitchEmote28Preset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,

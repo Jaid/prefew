@@ -51,7 +51,7 @@ export default class extends Preset {
   async render(sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
     const discordEmote22Preset = this.prefewCore.presets.discordEmote22
     const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
-    const renderedEmote = await this.prefewCore.render(sharpImage, discordEmote22Preset, {
+    const {buffer: renderedEmote} = await this.prefewCore.render(sharpImage, discordEmote22Preset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,

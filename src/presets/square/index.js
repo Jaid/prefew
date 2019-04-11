@@ -6,7 +6,7 @@ export default class extends Preset {
   constructor(prefewCore) {
     super(prefewCore)
     this.title = "Custom-sized square"
-        this.pixelatedZoom = true
+    this.pixelatedZoom = true
     this.addOptionsSchema({
       size: {
         defaultValue: 32,

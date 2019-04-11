@@ -14,6 +14,11 @@ import SocketServer from "./SocketServer"
 
 const debug = require("debug")(_PKG_NAME)
 
+const webpBufferConfig = {
+  quality: 100,
+  lossless: true,
+}
+
 export default class extends EventEmitter {
 
   constructor(options) {
@@ -161,15 +166,14 @@ export default class extends EventEmitter {
   createRenderWorker(jobPayloads) {
     const jobs = jobPayloads.map(async jobPayload => {
       const startTime = Date.now()
-      const renderedBuffer = await this.render(jobPayload.buffer, jobPayload.preset, jobPayload.options)
       return {
         startTime,
         previewId: jobPayload.previewId,
         presetOptions: jobPayload.options,
-        buffer: renderedBuffer,
         image: jobPayload.imageName,
         presetName: jobPayload.presetName,
         endTime: Date.now(),
+        ...await this.render(jobPayload.buffer, jobPayload.preset, jobPayload.options),
       }
     })
     return new PCancelable((resolve, reject, onCancel) => {
@@ -251,12 +255,14 @@ export default class extends EventEmitter {
       sharpImage = sharp(croppedBuffer)
     }
     const processedImage = await preset.render(sharpImage, options)
-    return processedImage
-      .webp({
-        quality: 100,
-        lossless: true,
-      })
-      .toBuffer()
+    const [metadata, buffer] = await Promise.all([
+      processedImage.metadata(),
+      processedImage.webp(webpBufferConfig).toBuffer(),
+    ])
+    return {
+      metadata,
+      buffer,
+    }
   }
 
   async exportImagesForClient(clientId) {

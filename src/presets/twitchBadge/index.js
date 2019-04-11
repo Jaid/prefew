@@ -36,7 +36,7 @@ export default class extends Preset {
   async render(sharpImage, {cropTolerance, sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
     const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
     const squarePreset = this.prefewCore.presets.square
-    const renderedBadge = await this.prefewCore.render(sharpImage, squarePreset, {
+    const {buffer: renderedBadge} = await this.prefewCore.render(sharpImage, squarePreset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,

@@ -47,7 +47,7 @@ export default class extends Preset {
   async render(sharpImage, {sharpen, sharpenSigma, sharpenFlat, sharpenJagged, darkMode}) {
     const backgroundBuffer = darkMode ? backgroundDarkBuffer : backgroundLightBuffer
     const squarePreset = this.prefewCore.presets.square
-    const renderedEmote42 = await this.prefewCore.render(sharpImage, squarePreset, {
+    const {buffer: renderedEmote42} = await this.prefewCore.render(sharpImage, squarePreset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,
@@ -60,7 +60,7 @@ export default class extends Preset {
       top: position.y,
       gravity: sharp.gravity.northwest,
     }))
-    const renderedEmote84 = await this.prefewCore.render(sharpImage, squarePreset, {
+    const {buffer: renderedEmote84} = await this.prefewCore.render(sharpImage, squarePreset, {
       sharpen,
       sharpenSigma,
       sharpenFlat,
