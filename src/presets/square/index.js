@@ -1,4 +1,4 @@
-import {pixelZoomOptions, cropOptions, sharpenOptions} from "../baseOptions"
+import {clientZoomOptions, cropOptions, sharpenOptions} from "../baseOptions"
 import Preset from "../Preset"
 
 export default class extends Preset {
@@ -6,6 +6,7 @@ export default class extends Preset {
   constructor(prefewCore) {
     super(prefewCore)
     this.title = "Custom-sized square"
+        this.pixelatedZoom = true
     this.addOptionsSchema({
       size: {
         defaultValue: 32,
@@ -19,7 +20,7 @@ export default class extends Preset {
         defaultValue: false,
         type: "boolean",
       },
-      ...pixelZoomOptions(),
+      ...clientZoomOptions(),
       ...cropOptions(),
       ...sharpenOptions(),
     })

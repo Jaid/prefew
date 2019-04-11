@@ -4,6 +4,7 @@ export default class {
 
   constructor(prefewCore) {
     this.prefewCore = prefewCore
+    this.pixelatedZoom = false
   }
 
   addOptionsSchema(optionsSchema) {

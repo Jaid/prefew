@@ -1,4 +1,4 @@
-import {pixelZoomOptions, cropOptions} from "../baseOptions"
+import {clientZoomOptions, cropOptions} from "../baseOptions"
 import Preset from "../Preset"
 
 const size = 22
@@ -8,9 +8,10 @@ export default class extends Preset {
   constructor(prefewCore) {
     super(prefewCore)
     this.title = `Discord Emote (${size}p)`
+    this.pixelatedZoom = true
     this.description = ""
     this.addOptionsSchema({
-      ...pixelZoomOptions(),
+      ...clientZoomOptions(),
       ...cropOptions(),
     })
   }

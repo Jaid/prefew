@@ -1,8 +1,10 @@
-export const pixelZoomOptions = () => ({
-  pixelZoom: {
+export const clientZoomOptions = () => ({
+  clientZoom: {
     defaultValue: 1,
-    min: 1,
-    max: 10,
+    min: 0.1,
+    step: 0.5,
+    precision: 1,
+    max: 15,
     type: "number",
   },
 })

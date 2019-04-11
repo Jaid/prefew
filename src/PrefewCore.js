@@ -250,13 +250,7 @@ export default class extends EventEmitter {
         .getBufferAsync(jimp.MIME_PNG)
       sharpImage = sharp(croppedBuffer)
     }
-    let processedImage = await preset.render(sharpImage, options)
-    if (options.pixelZoom > 1) {
-      const renderedBuffer = await processedImage.png({compressionLevel: 0}).toBuffer()
-      const newSharp = sharp(renderedBuffer)
-      const {width, height} = await newSharp.metadata()
-      processedImage = newSharp.resize(width * options.pixelZoom, height * options.pixelZoom, {kernel: "nearest"})
-    }
+    const processedImage = await preset.render(sharpImage, options)
     return processedImage
       .webp({
         quality: 100,
