@@ -1,4 +1,4 @@
-import {clientZoomOptions, cropOptions} from "../baseOptions"
+import {cropOptions} from "../baseOptions"
 import Preset from "../Preset"
 
 const size = 22
@@ -11,7 +11,6 @@ export default class extends Preset {
     this.pixelatedZoom = true
     this.description = ""
     this.addOptionsSchema({
-      ...clientZoomOptions(),
       ...cropOptions(),
     })
   }

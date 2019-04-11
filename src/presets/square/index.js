@@ -1,4 +1,4 @@
-import {clientZoomOptions, cropOptions, sharpenOptions} from "../baseOptions"
+import {cropOptions, sharpenOptions} from "../baseOptions"
 import Preset from "../Preset"
 
 export default class extends Preset {
@@ -20,7 +20,6 @@ export default class extends Preset {
         defaultValue: false,
         type: "boolean",
       },
-      ...clientZoomOptions(),
       ...cropOptions(),
       ...sharpenOptions(),
     })

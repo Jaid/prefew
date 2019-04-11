@@ -1,4 +1,4 @@
-import {clientZoomOptions, cropOptions, sharpenOptions} from "../baseOptions"
+import {cropOptions, sharpenOptions} from "../baseOptions"
 import Preset from "../Preset"
 
 const size = 28
@@ -10,7 +10,6 @@ export default class extends Preset {
     this.pixelatedZoom = true
     this.title = `Twitch Emote (${size}p)`
     this.addOptionsSchema({
-      ...clientZoomOptions(),
       ...cropOptions(),
       ...sharpenOptions(),
     })
