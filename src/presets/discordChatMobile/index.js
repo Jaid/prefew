@@ -32,7 +32,7 @@ const insertPositions = [
 export default class extends Preset {
 
   constructor(prefewCore) {
-    super(prefewCore)
+    super(prefewCore, 0.5)
     this.title = "Discord Chat (Mobile)"
     this.description = "Based on screenshots of Android 9 on a Google Pixel 2."
     this.addOptionsSchema({

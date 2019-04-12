@@ -4,10 +4,10 @@ import {clientZoomOptions} from "./baseOptions"
 
 export default class {
 
-  constructor(prefewCore) {
+  constructor(prefewCore, defaultZoom = 1) {
     this.prefewCore = prefewCore
     this.pixelatedZoom = false
-    this.addOptionsSchema(clientZoomOptions())
+    this.addOptionsSchema(clientZoomOptions(defaultZoom))
   }
 
   addOptionsSchema(optionsSchema) {

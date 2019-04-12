@@ -1,6 +1,6 @@
-export const clientZoomOptions = () => ({
+export const clientZoomOptions = (defaultValue = 1) => ({
   clientZoom: {
-    defaultValue: 1,
+    defaultValue,
     min: 0.1,
     step: 0.1,
     precision: 1,
