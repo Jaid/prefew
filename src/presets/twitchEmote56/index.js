@@ -6,7 +6,7 @@ const size = 56
 export default class extends Preset {
 
   constructor(prefewCore) {
-    super(prefewCore)
+    super(prefewCore, 2)
     this.pixelatedZoom = true
     this.title = `Twitch Emote (${size}p)`
     this.addOptionsSchema({
