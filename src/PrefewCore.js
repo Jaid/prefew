@@ -87,9 +87,8 @@ export default class extends EventEmitter {
   }
 
   async addImage(name, options) {
-    const entryOutputDirectory = path.join(this.outputDirectory, name)
     const image = {
-      entryOutputDirectory,
+      addedTime: Date.now(),
       ...options,
     }
     if (options.thumbnailSource) {
@@ -265,8 +264,8 @@ export default class extends EventEmitter {
 
   async exportImagesForClient(clientId) {
     const client = this.clients[clientId]
-    const image = this.images[client.options.image]
-    const imageOutputDirectory = path.join(image.entryOutputDirectory, String(Date.now()))
+    const exportTitle = client.options.exportTitle || client.options.image
+    const imageOutputDirectory = path.join(this.outputDirectory, exportTitle, String(Date.now()))
     await fsp.ensureDir(imageOutputDirectory)
     const lastRenderResult = client.lastRenderResult
     const jobs = lastRenderResult.map(async renderResult => {
