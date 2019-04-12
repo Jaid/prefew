@@ -27,7 +27,7 @@ export const sharpenOptions = () => ({
   },
   sharpenSigma: {
     defaultValue: 0.6,
-    min: 0.2,
+    min: 0.6,
     max: 2,
     precision: 1,
     step: 0.1,
