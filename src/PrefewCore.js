@@ -121,6 +121,10 @@ export default class extends EventEmitter {
     client.socketClient.emit("startingRender")
     const imageName = client.options.image
     const image = this.images[imageName]
+    if (!image) {
+      debug(`Skipping renderPreviewsForClient for ${client.mode} ${client.socketClient.id}, because image ${imageName} does not exist`)
+      return
+    }
     if (image.type === "file" && !image.buffer) {
       debug("Initially reading file contents for image %s", imageName)
       image.buffer = await fsp.readFile(image.imagePath)
