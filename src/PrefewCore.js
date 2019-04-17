@@ -203,6 +203,12 @@ export default class extends EventEmitter {
 
   updateClientOptions(id, options) {
     const client = this.clients[id]
+    for (const requestedPreset of options.presets) {
+      const preset = this.presets[requestedPreset.name]
+      if (!preset.validateOptions(requestedPreset.options)) {
+        return
+      }
+    }
     client.options = options
     this.updateImagePreviews(options.image)
   }

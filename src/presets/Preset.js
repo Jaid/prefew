@@ -1,6 +1,8 @@
-import {mapValues} from "lodash"
+import {mapValues, isNumber} from "lodash"
 
 import {clientZoomOptions} from "./baseOptions"
+
+const debug = require("debug")(_PKG_NAME)
 
 export default class {
 
@@ -23,6 +25,25 @@ export default class {
       ...this.defaultOptions,
       ...options,
     }
+  }
+
+  validateOptions(requestedOptions) {
+    for (const [optionName, optionValue] of Object.entries(requestedOptions)) {
+      const schema = this.optionsSchema[optionName]
+      if (schema) {
+        if (schema.type === "number") {
+          if (isNumber(schema.min) && schema.min > optionValue) {
+            debug(`Invalid option ${optionName}: Given value ${optionValue} is smaller than min value ${schema.min}`)
+            return false
+          }
+          if (isNumber(schema.max) && schema.max < optionValue) {
+            debug(`Invalid option ${optionName}: Given value ${optionValue} is greater than max value ${schema.max}`)
+            return false
+          }
+        }
+      }
+    }
+    return true
   }
 
 }

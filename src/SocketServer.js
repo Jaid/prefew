@@ -1,8 +1,6 @@
 import socketIo from "socket.io"
 import {pick, mapValues} from "lodash"
 
-const debug = require("debug")(_PKG_NAME)
-
 export default class SocketServer {
 
   constructor(port, prefewCore) {
