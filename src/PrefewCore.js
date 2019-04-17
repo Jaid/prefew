@@ -7,7 +7,7 @@ import parsePath from "lib/parsePath"
 import EventEmitter from "eventemitter3"
 import chokidar from "chokidar"
 import jimp from "src/jimp"
-import {isString, isBuffer, isEmpty} from "lodash"
+import {isString, isBuffer, isEmpty, isObject} from "lodash"
 import PCancelable from "p-cancelable"
 
 import SocketServer from "./SocketServer"
