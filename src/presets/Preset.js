@@ -28,7 +28,7 @@ export default class {
   }
 
   validateOptions(requestedOptions) {
-    for (const [optionName, optionValue] of Object.entries(requestedOptions)) {
+    for (const [optionName, optionValue] of requestedOptions |> Object.entries) {
       const schema = this.optionsSchema[optionName]
       if (schema) {
         if (schema.type === "number") {
