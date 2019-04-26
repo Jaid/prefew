@@ -13,7 +13,7 @@
     "jimp": "^0.6.1",
     "p-cancelable": "^2.0.0",
     "platform-folders": "^0.4.0",
-    "sharp": "^0.22.0",
+    "sharp": "^0.22.1",
     "socket.io": "^2.2.0",
     "winston": "^3.2.1",
     "yargs": "^13.2.2"
