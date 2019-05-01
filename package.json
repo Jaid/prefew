@@ -6,7 +6,7 @@
     "@absolunet/fsp": "^1.6.0",
     "@absolunet/fss": "^1.6.0",
     "@babel/runtime": "^7.4.4",
-    "chokidar": "^2.1.5",
+    "chokidar": "^3.0.0",
     "debug": "^4.1.1",
     "eventemitter3": "^3.1.2",
     "globby": "^9.2.0",
