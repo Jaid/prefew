@@ -49,5 +49,6 @@
     "test:dev": "NODE_ENV=test jest --runInBand",
     "test:debug": "npm run start",
     "prepareActionJest": "npm run build:prod"
-  }
+  },
+  "funding": "https://github.com/sponsors/jaid"
 }
