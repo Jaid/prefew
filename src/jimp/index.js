@@ -1,6 +1,6 @@
 import configure from "@jimp/custom/es"
-import png from "@jimp/png/es"
 import plugins from "@jimp/plugins/es"
+import png from "@jimp/png/es"
 
 import cropTransparent from "./cropTransparent"
 

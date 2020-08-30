@@ -1,14 +1,15 @@
-import path from "path"
-
-import globby from "globby"
 import fsp from "@absolunet/fsp"
-import sharp from "sharp"
-import parsePath from "lib/parsePath"
-import EventEmitter from "eventemitter3"
 import chokidar from "chokidar"
-import jimp from "src/jimp"
-import {isString, isBuffer, isEmpty, isObject} from "lodash"
+import EventEmitter from "eventemitter3"
+import globby from "globby"
+import {isBuffer, isEmpty, isObject, isString} from "lodash"
 import PCancelable from "p-cancelable"
+import path from "path"
+import sharp from "sharp"
+
+import parsePath from "lib/parsePath"
+
+import jimp from "src/jimp"
 
 import SocketServer from "./SocketServer"
 

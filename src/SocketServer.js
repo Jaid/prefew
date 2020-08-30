@@ -1,5 +1,5 @@
+import {mapValues, pick} from "lodash"
 import socketIo from "socket.io"
-import {pick, mapValues} from "lodash"
 
 export default class SocketServer {
 

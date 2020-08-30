@@ -1,12 +1,11 @@
 /** @module prefew */
 
-import path from "path"
-
-import {getConfigHome} from "platform-folders"
 import {noop} from "lodash"
+import path from "path"
+import {getConfigHome} from "platform-folders"
+import sharp from "sharp"
 import winston from "winston"
 import yargs from "yargs"
-import sharp from "sharp"
 
 import formatter from "./logFormatter"
 import PrefewCore from "./PrefewCore"
