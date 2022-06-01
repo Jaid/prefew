@@ -16,7 +16,7 @@
     "globby": "^11.0.1",
     "p-cancelable": "^2.0.0",
     "platform-folders": "^0.5.1",
-    "sharp": "0.26.0",
+    "sharp": "0.30.5",
     "socket.io": "^2.3.0",
     "winston": "^3.3.3",
     "yargs": "^15.4.1"
